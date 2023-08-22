@@ -59,6 +59,7 @@ The following are required
 
 ### Usage
 After installing the script run it as
+```
 ./cluster_collect.py -h
     OR
 python3 cluster_collect.py -h
@@ -74,14 +75,16 @@ options:
                         kubectl context to pull from (if none provided, all contexts in the kubectl config will be analyzed)
   -o OUTPUT, --output OUTPUT
                         output file (default is spyderbat-clusterinfo.json.gz)
+```
 
 By default, the script will collect information for all clusters configured in your kubeconfig file.
 If you want to collect only for a single one, use the -c CONTEXT flag, with the name of the context
 (as available in kubectl config get-contexts) to collect for.
 
 For example:
+```
 ./cluster_collect.py -c qacluster1
-
+```
 by default the output will go into a file called spyderbat-clusterinfo.json.gz
 You can use the -o flag to use another filename.
 
