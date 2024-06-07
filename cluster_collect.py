@@ -160,14 +160,20 @@ def load(args):
         contexts = [args.context]
 
     cluster_index = defaultdict(dict)
-
+    if len(contexts) == 0:
+        print('no contexts found', file=sys.stderr)
+        contexts = ["current-context"]
     for context in contexts:
         print(f'collecting data for {context}...', file=sys.stderr)
         index_schema = defaultdict(dict)
         index = {}
 
         for resource_type in resource_types:
-            cmd = f"kubectl {kubeconfig} --context {context} get {resource_type} -A -o json"
+            if context == "current-context":
+                context_command = ""
+            else:
+                context_command = f"--context {context}"
+            cmd = f"kubectl {kubeconfig} {context_command} get {resource_type} -A -o json"
             try:
                 result = subprocess.check_output(cmd, shell=True)
                 resources = json.loads(result)
