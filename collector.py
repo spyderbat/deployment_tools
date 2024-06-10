@@ -35,6 +35,7 @@ def memory_parser(input):
     return int(input)
 
 
+print("# Paste the following lines into your values.yaml file")
 # subprocess.run(["python", "cluster_collect.py"])
 # subprocess.run(
 #    [
@@ -52,6 +53,36 @@ def memory_parser(input):
 # )
 # subprocess.run(["kubectl-nodepools", "list", "--no-headers"])
 # Define the commands
+command1 = """kubectl get pods -A -o json | jq '.items | .[] | {"priorityClassName": .spec.priorityClassName , "priority": .spec.priority }' | jq -s . """
+command1o = subprocess.run(command1, shell=True, capture_output=True, text=True)
+data = json.loads(command1o.stdout)
+sc = {}
+for i in data:
+    if i["priority"] is not None and i["priority"] != 0:
+        if i["priorityClassName"] not in sc:
+            sc[i["priorityClassName"]] = i["priority"]
+
+"""
+priorityClassDefault:
+  enabled: false
+  name: default
+  value: 1000
+"""
+highValue = 0
+highName = ""
+for i, v in sc.items():
+    if v > highValue:
+        highValue = v
+        highName = i
+
+output = {
+    "priorityClassDefault": {"enabled": True, "name": highName, "value": highValue}
+}
+print(
+    "# this sets our priority class to the highest priority class in the cluster -- WARNING: this may not be what you want"
+)
+print(yaml.dump(output))
+
 command1 = ["kubectl", "get", "nodes", "-o", "json"]
 command2 = [
     "jq",
@@ -61,17 +92,13 @@ command3 = ["jq", "-s", "."]
 
 # Create the pipelines
 p1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
-print(p1)
 p2 = subprocess.Popen(command2, stdin=p1.stdout, stdout=subprocess.PIPE)
-print(p2)
 p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
 p3 = subprocess.Popen(command3, stdin=p2.stdout, stdout=subprocess.PIPE)
-print(p3)
 p2.stdout.close()  # Allow p2 to receive a SIGPIPE if p3 exits.
 
 # Execute the pipeline
 output = p3.communicate()[0]
-print(output)
 # Load the JSON output
 foo = json.loads(output)
 
@@ -81,5 +108,5 @@ for i in foo:
         "cpu": cpu_parser(i["cpu"]) * 0.04,
         "memory": memory_parser(i["memory"]) * 0.04,
     }
-print(yaml.dump(a))
+print(yaml.dump({"collector": a}))
 time.sleep(1000000)
