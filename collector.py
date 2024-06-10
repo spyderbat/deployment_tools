@@ -50,9 +50,7 @@ def memory_parser(input):
 # subprocess.run(
 #    ["cat", "current-context.values.yaml"],
 # )
-# print("not blocked")
 # subprocess.run(["kubectl-nodepools", "list", "--no-headers"])
-# print("blocked")
 # Define the commands
 command1 = ["kubectl", "get", "nodes", "-o", "json"]
 command2 = [
