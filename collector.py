@@ -36,21 +36,6 @@ def memory_parser(input):
 
 
 print("# Paste the following lines into your values.yaml file")
-# subprocess.run(["python", "cluster_collect.py"])
-# subprocess.run(
-#    [
-#        "python",
-#        "cluster_analyze.py",
-#        "-i",
-#        "spyderbat-clusterinfo.json.gz",
-#        "-t",
-#        "kubectl",
-#        "--helm-values",
-#    ]
-# )
-# subprocess.run(
-#    ["cat", "current-context.values.yaml"],
-# )
 # subprocess.run(["kubectl-nodepools", "list", "--no-headers"])
 # Define the commands
 command1 = """kubectl get pods -A -o json | jq '.items | .[] | {"priorityClassName": .spec.priorityClassName , "priority": .spec.priority }' | jq -s . """
@@ -62,12 +47,6 @@ for i in data:
         if i["priorityClassName"] not in sc:
             sc[i["priorityClassName"]] = i["priority"]
 
-"""
-priorityClassDefault:
-  enabled: false
-  name: default
-  value: 1000
-"""
 highValue = 0
 highName = ""
 for i, v in sc.items():
@@ -90,17 +69,11 @@ command2 = [
 ]
 command3 = ["jq", "-s", "."]
 
-# Create the pipelines
-p1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
-p2 = subprocess.Popen(command2, stdin=p1.stdout, stdout=subprocess.PIPE)
-p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
-p3 = subprocess.Popen(command3, stdin=p2.stdout, stdout=subprocess.PIPE)
-p2.stdout.close()  # Allow p2 to receive a SIGPIPE if p3 exits.
+command = """kubectl get nodes -o json | jq '.items | .[] | {"cpu": .status.allocatable.cpu,"memory":.status.allocatable.memory,"type":.metadata.labels."beta.kubernetes.io/instance-type"}' | jq -s ."""
+result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
-# Execute the pipeline
-output = p3.communicate()[0]
-# Load the JSON output
-foo = json.loads(output)
+# Parse the output as JSON
+foo = json.loads(result.stdout)
 
 a = {}
 for i in foo:
@@ -108,5 +81,6 @@ for i in foo:
         "cpu": cpu_parser(i["cpu"]) * 0.04,
         "memory": memory_parser(i["memory"]) * 0.04,
     }
-print(yaml.dump({"collector": a}))
+output = {"collector": a}
+print(yaml.dump(output))
 time.sleep(1000000)
