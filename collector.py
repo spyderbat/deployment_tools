@@ -81,6 +81,6 @@ for i in foo:
         "cpu": cpu_parser(i["cpu"]) * 0.04,
         "memory": memory_parser(i["memory"]) * 0.04,
     }
-output = {"collector": a}
+output = {"spyderbatrecommender": a}
 print(yaml.dump(output))
 time.sleep(1000000)
