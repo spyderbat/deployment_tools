@@ -1,0 +1,6 @@
+typeA:
+  memory: 1024
+  cpu: 1
+typeB:
+  memory: 2048
+  cpu: 2

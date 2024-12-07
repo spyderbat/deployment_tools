@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: god
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: god-role
+  namespace: default
+rules:
+  - apiGroups:
+      - "apps"
+      - "scheduling.k8s.io"
+      - ""
+    resources:
+      - "*"
+    verbs:
+      - "get"
+      - "list"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: god-role-binding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: god-role
+subjects:
+  - kind: ServiceAccount
+    name: god
+    namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: god-role
+  namespace: default
+rules:
+  - apiGroups:
+      - "apps"
+      - "scheduling.k8s.io"
+      - ""
+    resources:
+      - "*"
+    verbs:
+      - "get"
+      - "list"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: god-role-binding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: god-role
+subjects:
+  - kind: ServiceAccount
+    name: god
+    namespace: default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spyderbat-recommendation-tool
+  namespace: default
+  labels:
+    app: spyderbat-recommendation-tool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spyderbat-recommendation-tool
+  template:
+    metadata:
+      labels:
+        app: spyderbat-recommendation-tool
+    spec:
+      containers:
+        - name: spyderbat-recommendation-tool
+          image: public.ecr.aws/a6j2k0g1/cluster-collector:latest
+      serviceAccount: god
+      serviceAccountName: god
