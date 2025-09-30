@@ -107,7 +107,7 @@ def convert_unit(amount):
         return int(stripped[:-1])*1000*1000*1000*1000*1000*1000
     if stripped.endswith('m'):
         return int(stripped[:-1])/1000
-    return int(stripped)
+    return float(stripped)
 
 
 def condense_resources(cluster_data, kind):
