@@ -81,17 +81,20 @@ def convert_unit(amount):
     if type(amount) == int:
         return amount
     stripped = amount.strip()
-    if stripped.endswith('Ki'):
+    if stripped.endswith('m'):
+        return int(stripped[:-1])/1000
+    stripped = stripped.upper()
+    if stripped.endswith('KI'):
         return int(stripped[:-2])*1024
-    if stripped.endswith('Mi'):
+    if stripped.endswith('MI'):
         return int(stripped[:-2])*1024*1024
-    if stripped.endswith('Gi'):
+    if stripped.endswith('GI'):
         return int(stripped[:-2])*1024*1024*1024
-    if stripped.endswith('Ti'):
+    if stripped.endswith('TI'):
         return int(stripped[:-2])*1024*1024*1024*1024
-    if stripped.endswith('Pi'):
+    if stripped.endswith('PI'):
         return int(stripped[:-2])*1024*1024*1024*1024*1024
-    if stripped.endswith('Ei'):
+    if stripped.endswith('EI'):
         return int(stripped[:-2])*1024*1024*1024*1024*1024*1024
     if stripped.endswith('K'):
         return int(stripped[:-1])*1000
@@ -105,8 +108,6 @@ def convert_unit(amount):
         return int(stripped[:-1])*1000*1000*1000*1000*1000
     if stripped.endswith('E'):
         return int(stripped[:-1])*1000*1000*1000*1000*1000*1000
-    if stripped.endswith('m'):
-        return int(stripped[:-1])/1000
     return float(stripped)
 
 
